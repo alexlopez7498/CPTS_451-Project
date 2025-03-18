@@ -1,5 +1,5 @@
 # Sprint 1 Report 
-Video Link: 
+Video Link: video(https://youtu.be/VoTp32yBlgU)
 ## What's New (User Facing)
  * ER Diagram
  * User Stories
