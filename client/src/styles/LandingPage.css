@@ -1,0 +1,121 @@
+.container {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: url('https://source.unsplash.com/1600x900/?olympics,stadium') center/cover no-repeat;
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.content {
+  position: relative;
+  text-align: center;
+  color: white;
+  padding: 20px;
+  width: 80%;
+  max-width: 600px;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(255, 255, 255, 0.2);
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 600;
+}
+
+.subtitle {
+  font-size: 1rem;
+  margin-bottom: 20px;
+}
+
+.search-container {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.search-input {
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  width: 250px;
+  font-size: 1rem;
+}
+
+.search-button {
+  padding: 12px 18px;
+  background: linear-gradient(90deg, #bdbaab, #131110);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: 0.3s ease-in-out;
+}
+
+.search-button:hover {
+  background: linear-gradient(90deg, #131110, #bdbaab);
+  transform: scale(1.05);
+}
+
+.results-container {
+  background: white;
+  color: black;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  max-width: 400px;
+  margin: 20px auto;
+}
+
+.results-container ul {
+  list-style: none;
+  padding: 0;
+}
+
+.results-title {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.result-item {
+  border-bottom: 1px solid #ddd;
+  padding: 8px 0;
+}
+
+.no-results {
+  color: #888;
+}
+
+.visualization-container {
+  background: white;
+  color: black;
+  padding: 20px;
+  margin: 20px auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  width: 100%;
+  max-width: 500px;
+}
+
+.visualization-title {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.visualization-text {
+  color: #666;
+}
