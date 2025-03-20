@@ -14,14 +14,12 @@ export default function LandingPage() {
     <div className="container">
       <div className="overlay"></div>
 
-      {/* Main Content */}
       <div className="content">
         <h1 className="title">Olympic Athlete Database</h1>
         <p className="subtitle">
           Search and explore data about Olympic athletes, events, and records.
         </p>
 
-        {/* Search Bar */}
         <div className="search-container">
           <input
             type="text"
@@ -35,7 +33,6 @@ export default function LandingPage() {
           </button>
         </div>
 
-        {/* Search Results */}
         <div className="results-container">
           <h2 className="results-title">Results</h2>
           <ul>
@@ -49,7 +46,6 @@ export default function LandingPage() {
           </ul>
         </div>
 
-        {/* Data Visualization Placeholder */}
         <div className="visualization-container">
           <h2 className="visualization-title">Data Visualization</h2>
           <p className="visualization-text">

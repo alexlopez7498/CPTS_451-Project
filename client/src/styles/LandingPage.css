@@ -53,22 +53,6 @@
   font-size: 1rem;
 }
 
-.search-button {
-  padding: 12px 18px;
-  background: linear-gradient(90deg, #bdbaab, #131110);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: 0.3s ease-in-out;
-}
-
-.search-button:hover {
-  background: linear-gradient(90deg, #131110, #bdbaab);
-  transform: scale(1.05);
-}
-
 .results-container {
   background: white;
   color: black;
