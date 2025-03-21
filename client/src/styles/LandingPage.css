@@ -1,3 +1,4 @@
+/* General Layout */
 .container {
   position: relative;
   min-height: 100vh;
@@ -38,21 +39,38 @@
   margin-bottom: 20px;
 }
 
+/* Search Bar */
 .search-container {
   display: flex;
   justify-content: center;
-  gap: 10px;
+  gap: 0; /* Removes extra space between input and button */
   margin-bottom: 20px;
 }
 
 .search-input {
   padding: 12px;
   border: none;
-  border-radius: 8px;
+  border-radius: 8px 0 0 8px;
   width: 250px;
   font-size: 1rem;
+  height: 20px;
 }
 
+.search-button {
+  padding: 12px 18px;
+  background: #000000;
+  border: none;
+  border-radius: 0 8px 8px 0;
+  font-size: 1rem;
+  cursor: pointer;
+  height: 45px;
+}
+
+.search-button:hover {
+  background: #000000;
+}
+
+/* Results */
 .results-container {
   background: white;
   color: black;
@@ -83,23 +101,45 @@
   color: #888;
 }
 
-.visualization-container {
+/* Login/Logout Button */
+.auth-button {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: #000000;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 5px;
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: 0.3s;
+  cursor: pointer;
+  border: none;
+}
+
+.auth-button:hover {
+  background: #6f6f6f;
+}
+
+/* Admin Controls */
+.admin-controls {
+  margin-top: 20px;
+  padding: 10px;
   background: white;
   color: black;
-  padding: 20px;
-  margin: 20px auto;
   border-radius: 8px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-  text-align: center;
-  width: 100%;
-  max-width: 500px;
 }
 
-.visualization-title {
-  font-size: 1.2rem;
-  font-weight: bold;
+.admin-button {
+  margin: 5px;
+  padding: 10px;
+  background: #000000;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
 }
-
-.visualization-text {
-  color: #666;
+.admin-button:hover {
+  background: #000000;
 }
