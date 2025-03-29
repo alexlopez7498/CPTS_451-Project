@@ -7,6 +7,7 @@ export default function LandingPage({ isAdmin, setIsAdmin }) {
   const [results, setResults] = useState([]);
   const navigate = useNavigate();
 
+  // Add Athlete Modal states
   const [showAddAthleteModal, setShowAddAthleteModal] = useState(false);
   const [newAthlete, setNewAthlete] = useState({
     name: '',
@@ -15,6 +16,39 @@ export default function LandingPage({ isAdmin, setIsAdmin }) {
     height: '',
     weight: '',
     noc: ''
+  });
+
+  // Delete Data Modal states
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteCriteria, setDeleteCriteria] = useState({
+    type: 'athlete',
+    name: '',
+    confirmation: ''
+  });
+
+  // Hardcoded data for testing all types
+  const [dataOptions] = useState({
+    athlete: [
+      { id: 1, name: "Michael Phelps" },
+      { id: 2, name: "Usain Bolt" },
+      { id: 3, name: "Simone Biles" },
+      { id: 4, name: "Serena Williams" },
+      { id: 5, name: "Katie Ledecky" }
+    ],
+    event: [
+      { id: 1, name: "100m Freestyle Swimming" },
+      { id: 2, name: "4x100m Relay" },
+      { id: 3, name: "Marathon" },
+      { id: 4, name: "Gymnastics All-Around" },
+      { id: 5, name: "Basketball" }
+    ],
+    region: [
+      { id: 1, name: "United States" },
+      { id: 2, name: "Jamaica" },
+      { id: 3, name: "Kenya" },
+      { id: 4, name: "China" },
+      { id: 5, name: "Germany" }
+    ]
   });
 
   const handleSearch = () => {
@@ -27,6 +61,7 @@ export default function LandingPage({ isAdmin, setIsAdmin }) {
     navigate("/");
   };
 
+  // Add Athlete handlers
   const handleAddAthleteClick = () => {
     setShowAddAthleteModal(true);
   };
@@ -59,6 +94,49 @@ export default function LandingPage({ isAdmin, setIsAdmin }) {
     } catch (error) {
       console.error("Error adding athlete:", error);
       alert("Failed to add athlete");
+    }
+  };
+
+  // Delete Data handlers
+  const handleDeleteDataClick = () => {
+    setShowDeleteModal(true);
+  };
+
+  const handleDeleteInputChange = (e) => {
+    const { name, value } = e.target;
+    setDeleteCriteria(prev => ({
+      ...prev,
+      [name]: value,
+      // Reset name when type changes
+      ...(name === 'type' && { name: '' })
+    }));
+  };
+
+  const handleDeleteSubmit = async (e) => {
+    e.preventDefault();
+    
+    console.log("Deleting:", deleteCriteria);
+    
+    try {
+      // API call to delete data
+      // const response = await fetch(`/api/${deleteCriteria.type}/${deleteCriteria.name}`, {
+      //   method: 'DELETE'
+      // });
+      
+      // if (response.ok) {
+        alert(`${deleteCriteria.name} (${deleteCriteria.type}) deleted successfully!`);
+        setShowDeleteModal(false);
+        setDeleteCriteria({
+          type: 'athlete',
+          name: '',
+          confirmation: ''
+        });
+      // } else {
+      //   throw new Error('Failed to delete data');
+      // }
+    } catch (error) {
+      console.error("Error deleting data:", error);
+      alert("Failed to delete data");
     }
   };
 
@@ -116,7 +194,9 @@ export default function LandingPage({ isAdmin, setIsAdmin }) {
                 Add Athlete
               </button>
               <button className="admin-button">Modify Records</button>
-              <button className="admin-button">Delete Data</button>
+              <button className="admin-button" onClick={handleDeleteDataClick}>
+                Delete Data
+              </button>
             </div>
           </div>
         )}
@@ -210,6 +290,76 @@ export default function LandingPage({ isAdmin, setIsAdmin }) {
                 </button>
                 <button type="submit" className="submit-button">
                   Submit
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Data Modal */}
+      {showDeleteModal && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h3>Delete Data</h3>
+            <div className="danger-text">Warning: This action cannot be undone</div>
+            <form onSubmit={handleDeleteSubmit}>
+              <div className="form-group">
+                <label>Data Type:</label>
+                <select
+                  name="type"
+                  value={deleteCriteria.type}
+                  onChange={handleDeleteInputChange}
+                  className="delete-select"
+                  required
+                >
+                  <option value="athlete">Athlete</option>
+                  <option value="event">Event</option>
+                  <option value="region">Region</option>
+                </select>
+              </div>
+              
+              <div className="form-group">
+                <label>Select {deleteCriteria.type} to Delete:</label>
+                <select
+                  name="name"
+                  value={deleteCriteria.name}
+                  onChange={handleDeleteInputChange}
+                  className="delete-select"
+                  required
+                  disabled={!deleteCriteria.type}
+                >
+                  <option value="">-- Select {deleteCriteria.type} --</option>
+                  {dataOptions[deleteCriteria.type]?.map(item => (
+                    <option key={item.id} value={item.name}>
+                      {item.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              
+              <div className="form-group">
+                <label>Type "DELETE" to confirm:</label>
+                <input
+                  type="text"
+                  name="confirmation"
+                  value={deleteCriteria.confirmation}
+                  onChange={handleDeleteInputChange}
+                  placeholder="Type DELETE to confirm"
+                  required
+                />
+              </div>
+              
+              <div className="modal-actions">
+                <button type="button" className="cancel-button" onClick={() => setShowDeleteModal(false)}>
+                  Cancel
+                </button>
+                <button 
+                  type="submit" 
+                  className="delete-button"
+                  disabled={!deleteCriteria.name || deleteCriteria.confirmation !== "DELETE"}
+                >
+                  Delete
                 </button>
               </div>
             </form>

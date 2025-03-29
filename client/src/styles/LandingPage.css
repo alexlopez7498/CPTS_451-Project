@@ -213,3 +213,34 @@
   color: white;
   border: none;
 }
+
+/* Delete Modal Specific Styles */
+.delete-select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+  margin-bottom: 15px;
+}
+
+.delete-button {
+  padding: 10px 20px;
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.delete-button:hover {
+  background-color: #c0392b;
+}
+
+/* Danger text for delete confirmation */
+.danger-text {
+  color: #e74c3c;
+  font-weight: bold;
+  margin-top: 10px;
+}
