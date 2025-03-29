@@ -9,7 +9,7 @@ require("dotenv").config();
 
 // Middlewares setup
 app.use(cors()); 
-
+app.use(express.json()); 
 app.use(`/api`, routes);
 
 const testConnection = async () => {
@@ -21,8 +21,17 @@ const testConnection = async () => {
   }
 }
 
-sequelize.sync().then(() => {
+sequelize.sync({ alter: true }).then(async () => {
     console.log('Sequelize sync completed...');
+    
+    // Fix auto-increment counter
+    const [result] = await sequelize.query(`
+        SELECT setval(
+            pg_get_serial_sequence('athlete', 'id'), 
+            (SELECT MAX(id) FROM athlete) + 1
+        );
+    `);
+    console.log('Auto-increment counter reset to MAX(id) + 1');
 });
 
 testConnection();

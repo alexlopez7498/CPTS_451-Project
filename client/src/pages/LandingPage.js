@@ -77,23 +77,49 @@ export default function LandingPage({ isAdmin, setIsAdmin }) {
   const handleSubmitAthlete = async (e) => {
     e.preventDefault();
     console.log("Submitting new athlete:", newAthlete);
+
+    // Declare athleteData properly
+    const athleteData = {
+        name: newAthlete.name,
+        sex: newAthlete.sex,
+        age: newAthlete.age,
+        height: newAthlete.height,
+        weight: newAthlete.weight,
+        noc: newAthlete.noc
+    };
     
     try {
-      // API call here
-      // const response = await fetch(...)
-      alert("Athlete added successfully!");
-      setShowAddAthleteModal(false);
-      setNewAthlete({
-        name: '',
-        sex: '',
-        age: '',
-        height: '',
-        weight: '',
-        noc: ''
-      });
+        // API call here
+        const response = await fetch('http://localhost:5000/api/insertAthlete', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(athleteData),
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            alert('New Athlete inserted!');
+        } else {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Insert failed');
+        }
+
+        // Reset the form and close the modal
+        alert("Athlete added successfully!");
+        setShowAddAthleteModal(false);
+        setNewAthlete({
+            name: '',
+            sex: '',
+            age: '',
+            height: '',
+            weight: '',
+            noc: ''
+        });
     } catch (error) {
-      console.error("Error adding athlete:", error);
-      alert("Failed to add athlete");
+        console.error("Error adding athlete:", error);
+        alert("Failed to add athlete");
     }
   };
 

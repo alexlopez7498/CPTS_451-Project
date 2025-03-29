@@ -14,6 +14,7 @@ class Athlete extends Model {
 
     static async createAthlete(a_name, a_sex, a_age, a_height, a_weight, a_noc) {
         try {
+
             console.log(`Creating athlete ${a_name}, ${a_sex}, ${a_age}, ${a_height}, ${a_weight}, ${a_noc}`);
             const athlete = await Athlete.create({
                 name: a_name,
@@ -25,7 +26,7 @@ class Athlete extends Model {
             });
             return athlete;
         } catch (error) {
-            return null;
+            throw error; 
         }
     }
 
@@ -74,6 +75,7 @@ Athlete.init({
     sequelize,
     modelName: 'Athlete',
     tableName: 'athlete',
+    timestamps: false,
 });
 
 module.exports = Athlete;
