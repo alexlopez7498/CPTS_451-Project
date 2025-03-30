@@ -1,15 +1,32 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import {
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+} from "recharts";
 import "../styles/LandingPage.css";
 
-export default function LandingPage( {isAdmin, setIsAdmin} ) {
+export default function LandingPage({ isAdmin, setIsAdmin }) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
+  const [chartData, setChartData] = useState([]);
   const navigate = useNavigate();
 
   const handleSearch = () => {
     console.log("Search query:", query);
-    setResults(["This is how the results will show up. Test for search query and now we just integrate queries with the backend."]);
+    // Hardcoded sample data for demonstration
+    setResults(["Usain Bolt"]); // Example result
+    setChartData([
+      { event: "100m", medals: 3 },
+      { event: "200m", medals: 3 },
+      { event: "4x100m Relay", medals: 2 },
+    ]);
   };
 
   const handleLogout = () => {
@@ -22,9 +39,13 @@ export default function LandingPage( {isAdmin, setIsAdmin} ) {
       <div className="overlay"></div>
 
       {!isAdmin ? (
-        <Link to="/login" className="auth-button">Log in as Administrator</Link>
+        <Link to="/login" className="auth-button">
+          Log in as Administrator
+        </Link>
       ) : (
-        <button onClick={handleLogout} className="auth-button">Logout</button>
+        <button onClick={handleLogout} className="auth-button">
+          Logout
+        </button>
       )}
 
       <div className="content">
@@ -57,8 +78,23 @@ export default function LandingPage( {isAdmin, setIsAdmin} ) {
               <p className="no-results">No results found.</p>
             )}
           </ul>
+          {chartData.length > 0 && (
+            <div className="chart-container">
+              <h3>Medal Wins by Event</h3>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={chartData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="event" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Bar dataKey="medals" fill="#8884d8" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          )}
         </div>
-        {/* // This is the admin controls section. It will only show up if an Admin logs in. */}
+
         {isAdmin && (
           <div className="admin-controls">
             <h2>Admin Controls</h2>
