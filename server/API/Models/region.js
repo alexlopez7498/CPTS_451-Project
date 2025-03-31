@@ -53,6 +53,7 @@ Region.init({
     sequelize,
     modelName: 'Region',
     tableName: 'region',
+    timestamps: false,
 });
 
 module.exports = Region;

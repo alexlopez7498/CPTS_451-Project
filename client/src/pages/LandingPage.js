@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import Select from 'react-select';
 import "../styles/LandingPage.css";
 
 export default function LandingPage({ isAdmin, setIsAdmin }) {
@@ -22,34 +23,51 @@ export default function LandingPage({ isAdmin, setIsAdmin }) {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteCriteria, setDeleteCriteria] = useState({
     type: 'athlete',
+    id: '', // Add id field
     name: '',
     confirmation: ''
   });
 
-  // Hardcoded data for testing all types
-  const [dataOptions] = useState({
-    athlete: [
-      { id: 1, name: "Michael Phelps" },
-      { id: 2, name: "Usain Bolt" },
-      { id: 3, name: "Simone Biles" },
-      { id: 4, name: "Serena Williams" },
-      { id: 5, name: "Katie Ledecky" }
-    ],
-    event: [
-      { id: 1, name: "100m Freestyle Swimming" },
-      { id: 2, name: "4x100m Relay" },
-      { id: 3, name: "Marathon" },
-      { id: 4, name: "Gymnastics All-Around" },
-      { id: 5, name: "Basketball" }
-    ],
-    region: [
-      { id: 1, name: "United States" },
-      { id: 2, name: "Jamaica" },
-      { id: 3, name: "Kenya" },
-      { id: 4, name: "China" },
-      { id: 5, name: "Germany" }
-    ]
+  // State for dynamically fetched data
+  const [dataOptions, setDataOptions] = useState({
+    athlete: [],
+    event: [],
+    region: []
   });
+
+  // Fetch data from the backend
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [athleteRes, eventRes, regionRes] = await Promise.all([
+          fetch('http://localhost:5000/api/getAthletes'),
+          fetch('http://localhost:5000/api/getRegions'),
+          fetch('http://localhost:5000/api/getEvents')
+        ]);
+
+        const [athletes, events, regions] = await Promise.all([
+          athleteRes.json(),
+          eventRes.json(),
+          regionRes.json()
+        ]);
+        console.log("Fetched athletes:", athletes);
+        console.log("Fetched events:", events);
+        setDataOptions({
+          athlete: athletes,
+          event: events,
+          region: regions
+        });
+        console.log("Data options set:", dataOptions);
+        console.log("Data options athletes:", dataOptions.athlete);
+        console.log("Data options events:", dataOptions.event);
+        console.log("Data options regions:", dataOptions.region);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const handleSearch = () => {
     console.log("Search query:", query);
@@ -78,52 +96,47 @@ export default function LandingPage({ isAdmin, setIsAdmin }) {
     e.preventDefault();
     console.log("Submitting new athlete:", newAthlete);
 
-    // Declare athleteData properly
     const athleteData = {
-        name: newAthlete.name,
-        sex: newAthlete.sex,
-        age: newAthlete.age,
-        height: newAthlete.height,
-        weight: newAthlete.weight,
-        noc: newAthlete.noc
+      name: newAthlete.name,
+      sex: newAthlete.sex,
+      age: newAthlete.age,
+      height: newAthlete.height,
+      weight: newAthlete.weight,
+      noc: newAthlete.noc
     };
-    
+
     try {
-        // API call here
-        const response = await fetch('http://localhost:5000/api/insertAthlete', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(athleteData),
-        });
+      const response = await fetch('http://localhost:5000/api/insertAthlete', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(athleteData),
+      });
 
-        if (response.ok) {
-            const data = await response.json();
-            alert('New Athlete inserted!');
-        } else {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'Insert failed');
-        }
+      if (response.ok) {
+        const data = await response.json();
+        alert('New Athlete inserted!');
+      } else {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Insert failed');
+      }
 
-        // Reset the form and close the modal
-        alert("Athlete added successfully!");
-        setShowAddAthleteModal(false);
-        setNewAthlete({
-            name: '',
-            sex: '',
-            age: '',
-            height: '',
-            weight: '',
-            noc: ''
-        });
+      setShowAddAthleteModal(false);
+      setNewAthlete({
+        name: '',
+        sex: '',
+        age: '',
+        height: '',
+        weight: '',
+        noc: ''
+      });
     } catch (error) {
-        console.error("Error adding athlete:", error);
-        alert("Failed to add athlete");
+      console.error("Error adding athlete:", error);
+      alert("Failed to add athlete");
     }
   };
 
-  // Delete Data handlers
   const handleDeleteDataClick = () => {
     setShowDeleteModal(true);
   };
@@ -133,33 +146,47 @@ export default function LandingPage({ isAdmin, setIsAdmin }) {
     setDeleteCriteria(prev => ({
       ...prev,
       [name]: value,
-      // Reset name when type changes
       ...(name === 'type' && { name: '' })
     }));
   };
 
   const handleDeleteSubmit = async (e) => {
     e.preventDefault();
-    
+
     console.log("Deleting:", deleteCriteria);
-    
+
     try {
-      // API call to delete data
-      // const response = await fetch(`/api/${deleteCriteria.type}/${deleteCriteria.name}`, {
-      //   method: 'DELETE'
-      // });
-      
-      // if (response.ok) {
+      // Prepare the data to send to the API
+      const deleteData = {
+        type: deleteCriteria.type,
+        id: deleteCriteria.id, // Include id
+        name: deleteCriteria.name
+      };
+
+      // Make the API call
+      const response = await fetch(`http://localhost:5000/api/delete${deleteCriteria.type}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(deleteData),
+      });
+
+      if (response.ok) {
         alert(`${deleteCriteria.name} (${deleteCriteria.type}) deleted successfully!`);
-        setShowDeleteModal(false);
-        setDeleteCriteria({
-          type: 'athlete',
-          name: '',
-          confirmation: ''
-        });
-      // } else {
-      //   throw new Error('Failed to delete data');
-      // }
+      } else {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Delete failed');
+      }
+
+      // Reset the delete modal state
+      setShowDeleteModal(false);
+      setDeleteCriteria({
+        type: 'athlete',
+        id: '', 
+        name: '',
+        confirmation: ''
+      });
     } catch (error) {
       console.error("Error deleting data:", error);
       alert("Failed to delete data");
@@ -347,21 +374,26 @@ export default function LandingPage({ isAdmin, setIsAdmin }) {
               
               <div className="form-group">
                 <label>Select {deleteCriteria.type} to Delete:</label>
-                <select
-                  name="name"
-                  value={deleteCriteria.name}
-                  onChange={handleDeleteInputChange}
-                  className="delete-select"
-                  required
-                  disabled={!deleteCriteria.type}
-                >
-                  <option value="">-- Select {deleteCriteria.type} --</option>
-                  {dataOptions[deleteCriteria.type]?.map(item => (
-                    <option key={item.id} value={item.name}>
-                      {item.name}
-                    </option>
-                  ))}
-                </select>
+                <Select
+                  options={dataOptions[deleteCriteria.type]?.map(item => ({
+                    value: item.id, // Use id as the value
+                    label: item.name // Display name as the label
+                  })) || []}
+                  value={dataOptions[deleteCriteria.type]?.map(item => ({
+                    value: item.id,
+                    label: item.name
+                  })).find(option => option.value === deleteCriteria.id)} // Match by id
+                  onChange={(selectedOption) =>
+                    setDeleteCriteria(prev => ({
+                      ...prev,
+                      id: selectedOption?.value || '', // Set id
+                      name: selectedOption?.label || '' // Set name
+                    }))
+                  }
+                  isDisabled={!deleteCriteria.type}
+                  placeholder={`-- Select ${deleteCriteria.type} --`}
+                  isSearchable
+                />
               </div>
               
               <div className="form-group">
