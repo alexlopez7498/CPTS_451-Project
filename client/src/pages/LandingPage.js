@@ -1,22 +1,10 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Select from 'react-select';
-import {
-  ResponsiveContainer,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-} from "recharts";
+import SearchComponent from "../SearchComponent";
 import "../styles/LandingPage.css";
 
 export default function LandingPage({ isAdmin, setIsAdmin }) {
-  const [query, setQuery] = useState("");
-  const [results, setResults] = useState([]);
-  const [chartData, setChartData] = useState([]);
   const navigate = useNavigate();
 
   // Add Athlete Modal states
@@ -34,7 +22,7 @@ export default function LandingPage({ isAdmin, setIsAdmin }) {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteCriteria, setDeleteCriteria] = useState({
     type: 'athlete',
-    id: '', // Add id field
+    id: '',
     name: '',
     confirmation: ''
   });
@@ -61,17 +49,11 @@ export default function LandingPage({ isAdmin, setIsAdmin }) {
           eventRes.json(),
           regionRes.json()
         ]);
-        console.log("Fetched athletes:", athletes);
-        console.log("Fetched events:", events);
         setDataOptions({
           athlete: athletes,
           event: events,
           region: regions
         });
-        console.log("Data options set:", dataOptions);
-        console.log("Data options athletes:", dataOptions.athlete);
-        console.log("Data options events:", dataOptions.event);
-        console.log("Data options regions:", dataOptions.region);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -79,17 +61,6 @@ export default function LandingPage({ isAdmin, setIsAdmin }) {
 
     fetchData();
   }, []);
-
-  const handleSearch = () => {
-    console.log("Search query:", query);
-    // Hardcoded sample data for demonstration
-    setResults(["Usain Bolt"]); // Example result
-    setChartData([
-      { event: "100m", medals: 3 },
-      { event: "200m", medals: 3 },
-      { event: "4x100m Relay", medals: 2 },
-    ]);
-  };
 
   const handleLogout = () => {
     setIsAdmin(false);
@@ -111,8 +82,6 @@ export default function LandingPage({ isAdmin, setIsAdmin }) {
 
   const handleSubmitAthlete = async (e) => {
     e.preventDefault();
-    console.log("Submitting new athlete:", newAthlete);
-
     const athleteData = {
       name: newAthlete.name,
       sex: newAthlete.sex,
@@ -132,7 +101,6 @@ export default function LandingPage({ isAdmin, setIsAdmin }) {
       });
 
       if (response.ok) {
-        const data = await response.json();
         alert('New Athlete inserted!');
       } else {
         const errorData = await response.json();
@@ -169,18 +137,13 @@ export default function LandingPage({ isAdmin, setIsAdmin }) {
 
   const handleDeleteSubmit = async (e) => {
     e.preventDefault();
-
-    console.log("Deleting:", deleteCriteria);
+    const deleteData = {
+      type: deleteCriteria.type,
+      id: deleteCriteria.id,
+      name: deleteCriteria.name
+    };
 
     try {
-      // Prepare the data to send to the API
-      const deleteData = {
-        type: deleteCriteria.type,
-        id: deleteCriteria.id, // Include id
-        name: deleteCriteria.name
-      };
-
-      // Make the API call
       const response = await fetch(`http://localhost:5000/api/delete${deleteCriteria.type}`, {
         method: 'DELETE',
         headers: {
@@ -196,11 +159,10 @@ export default function LandingPage({ isAdmin, setIsAdmin }) {
         throw new Error(errorData.message || 'Delete failed');
       }
 
-      // Reset the delete modal state
       setShowDeleteModal(false);
       setDeleteCriteria({
         type: 'athlete',
-        id: '', 
+        id: '',
         name: '',
         confirmation: ''
       });
@@ -213,8 +175,6 @@ export default function LandingPage({ isAdmin, setIsAdmin }) {
   return (
     <div className="container">
       <div className="overlay"></div>
-
-      {/* Authentication button */}
       {!isAdmin ? (
         <Link to="/login" className="auth-button">
           Log in as Administrator
@@ -224,56 +184,12 @@ export default function LandingPage({ isAdmin, setIsAdmin }) {
           Logout
         </button>
       )}
-
       <div className="content">
         <h1 className="title">Olympic Athlete Database</h1>
         <p className="subtitle">
           Search and explore data about Olympic athletes, events, and records.
         </p>
-
-        {/* Search section */}
-        <div className="search-container">
-          <input
-            type="text"
-            placeholder="Search athletes, sports, or years..."
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            className="search-input"
-          />
-          <button onClick={handleSearch} className="search-button">
-            🔍 Search
-          </button>
-        </div>
-
-        {/* Results section */}
-        <div className="results-container">
-          <h2 className="results-title">Results</h2>
-          <ul>
-            {results.length > 0 ? (
-              results.map((result, index) => (
-                <li key={index} className="result-item">{result}</li>
-              ))
-            ) : (
-              <p className="no-results">No results found.</p>
-            )}
-          </ul>
-          {chartData.length > 0 && (
-            <div className="chart-container">
-              <h3>Medal Wins by Event</h3>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={chartData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="event" />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Bar dataKey="medals" fill="#8884d8" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          )}
-        </div>
-
+        <SearchComponent />
         {isAdmin && (
           <div className="admin-controls">
             <h2>Admin Controls</h2>
@@ -289,8 +205,6 @@ export default function LandingPage({ isAdmin, setIsAdmin }) {
           </div>
         )}
       </div>
-
-      {/* Add Athlete Modal */}
       {showAddAthleteModal && (
         <div className="modal-overlay">
           <div className="modal-content">
@@ -308,7 +222,6 @@ export default function LandingPage({ isAdmin, setIsAdmin }) {
                     required
                   />
                 </div>
-                
                 <div className="form-group">
                   <label>Sex (M/F):</label>
                   <input
@@ -321,7 +234,6 @@ export default function LandingPage({ isAdmin, setIsAdmin }) {
                   />
                 </div>
               </div>
-              
               <div className="form-row">
                 <div className="form-group">
                   <label>Age:</label>
@@ -334,7 +246,6 @@ export default function LandingPage({ isAdmin, setIsAdmin }) {
                     required
                   />
                 </div>
-                
                 <div className="form-group">
                   <label>Height:</label>
                   <input
@@ -346,7 +257,6 @@ export default function LandingPage({ isAdmin, setIsAdmin }) {
                     required
                   />
                 </div>
-                
                 <div className="form-group">
                   <label>Weight:</label>
                   <input
@@ -359,7 +269,6 @@ export default function LandingPage({ isAdmin, setIsAdmin }) {
                   />
                 </div>
               </div>
-              
               <div className="form-group">
                 <label>NOC (3-letter code):</label>
                 <input
@@ -371,7 +280,6 @@ export default function LandingPage({ isAdmin, setIsAdmin }) {
                   required
                 />
               </div>
-              
               <div className="modal-actions">
                 <button type="button" className="cancel-button" onClick={() => setShowAddAthleteModal(false)}>
                   Cancel
@@ -384,8 +292,6 @@ export default function LandingPage({ isAdmin, setIsAdmin }) {
           </div>
         </div>
       )}
-
-      {/* Delete Data Modal */}
       {showDeleteModal && (
         <div className="modal-overlay">
           <div className="modal-content">
@@ -406,23 +312,22 @@ export default function LandingPage({ isAdmin, setIsAdmin }) {
                   <option value="region">Region</option>
                 </select>
               </div>
-              
               <div className="form-group">
                 <label>Select {deleteCriteria.type} to Delete:</label>
                 <Select
                   options={dataOptions[deleteCriteria.type]?.map(item => ({
-                    value: item.id, // Use id as the value
-                    label: item.name // Display name as the label
+                    value: item.id,
+                    label: item.name
                   })) || []}
                   value={dataOptions[deleteCriteria.type]?.map(item => ({
                     value: item.id,
                     label: item.name
-                  })).find(option => option.value === deleteCriteria.id)} // Match by id
+                  })).find(option => option.value === deleteCriteria.id)}
                   onChange={(selectedOption) =>
                     setDeleteCriteria(prev => ({
                       ...prev,
-                      id: selectedOption?.value || '', // Set id
-                      name: selectedOption?.label || '' // Set name
+                      id: selectedOption?.value || '',
+                      name: selectedOption?.label || ''
                     }))
                   }
                   isDisabled={!deleteCriteria.type}
@@ -430,7 +335,6 @@ export default function LandingPage({ isAdmin, setIsAdmin }) {
                   isSearchable
                 />
               </div>
-              
               <div className="form-group">
                 <label>Type "DELETE" to confirm:</label>
                 <input
@@ -442,13 +346,12 @@ export default function LandingPage({ isAdmin, setIsAdmin }) {
                   required
                 />
               </div>
-              
               <div className="modal-actions">
                 <button type="button" className="cancel-button" onClick={() => setShowDeleteModal(false)}>
                   Cancel
                 </button>
-                <button 
-                  type="submit" 
+                <button
+                  type="submit"
                   className="delete-button"
                   disabled={!deleteCriteria.name || deleteCriteria.confirmation !== "DELETE"}
                 >
