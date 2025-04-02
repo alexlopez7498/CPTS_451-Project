@@ -5,7 +5,7 @@ import pandas as pd
 conn_params = {
     'dbname': '451Database', 
     'user': 'postgres', # replace with your username
-    'password': '*******',     # Replace with your password
+    'password': '',     # Replace with your password
     'host': 'localhost', 
     'port': '5432'
 }
