@@ -173,11 +173,11 @@ export default function LandingPage({ isAdmin, setIsAdmin }) {
       }
 
 
-    const deleteData = {
-      type: deleteCriteria.type,
-      id: deleteCriteria.id,
-      name: deleteCriteria.name
-    };
+    // const deleteData = {
+    //   type: deleteCriteria.type,
+    //   id: deleteCriteria.id,
+    //   name: deleteCriteria.name
+    // };
 
     try {
       const response = await fetch(`http://localhost:5000/api/delete${deleteCriteria.type}`, {
@@ -206,8 +206,11 @@ export default function LandingPage({ isAdmin, setIsAdmin }) {
       console.error("Error deleting data:", error);
       alert(`Failed to delete ${deleteCriteria.type}: ${error.message}`);
     }
-  };
-
+  } catch (error) {
+      console.error("Error preparing delete data:", error);
+      alert("Failed to prepare delete data");
+    }
+  }
   return (
     <div className="container">
       <div className="overlay"></div>
