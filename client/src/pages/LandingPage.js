@@ -4,6 +4,49 @@ import Select from 'react-select';
 import SearchComponent from "../SearchComponent";
 import "../styles/LandingPage.css";
 
+const PaginatedSearchableDropdown = ({ dataOptions, deleteCriteria, setDeleteCriteria }) => {
+  
+  const [page] = useState(0); 
+  const [searchQuery, setSearchQuery] = useState("");
+  const pageSize = 100;
+
+  const filteredOptions = (dataOptions[deleteCriteria.type] || []).filter(item =>
+    item.label.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const paginatedOptions = filteredOptions.slice(
+    page * pageSize,
+    (page + 1) * pageSize
+  ).map(item => ({
+    value: item.value,
+    label: item.label,
+  }));
+
+  const handleSearchChange = (inputValue) => {
+    setSearchQuery(inputValue);
+  };
+
+  return (
+    <div>
+      <Select
+        options={paginatedOptions}
+        value={paginatedOptions.find(option => option.value === deleteCriteria.id)}
+        onChange={(selectedOption) =>
+          setDeleteCriteria(prev => ({
+            ...prev,
+            id: selectedOption?.value || "",
+            name: selectedOption?.label || "",
+          }))
+        }
+        onInputChange={handleSearchChange}
+        isClearable
+        placeholder={`Select ${deleteCriteria.type}...`}
+        isSearchable
+      />
+    </div>
+  );
+};
+
 export default function LandingPage({ isAdmin, setIsAdmin }) {
   const navigate = useNavigate();
 
@@ -35,7 +78,6 @@ export default function LandingPage({ isAdmin, setIsAdmin }) {
   });
 
   // Fetch data from the backend
-  useEffect(() => {
     const fetchData = async () => {
       try {
         const [athleteRes, regionRes, eventRes] = await Promise.all([
@@ -70,8 +112,6 @@ export default function LandingPage({ isAdmin, setIsAdmin }) {
       }
     };
 
-    fetchData();
-  }, []);
 
   const handleLogout = () => {
     setIsAdmin(false);
@@ -80,6 +120,7 @@ export default function LandingPage({ isAdmin, setIsAdmin }) {
 
   // Add Athlete handlers
   const handleAddAthleteClick = () => {
+    fetchData();
     setShowAddAthleteModal(true);
   };
 
@@ -134,6 +175,7 @@ export default function LandingPage({ isAdmin, setIsAdmin }) {
   };
 
   const handleDeleteDataClick = () => {
+    fetchData();
     setShowDeleteModal(true);
   };
 
@@ -353,22 +395,10 @@ export default function LandingPage({ isAdmin, setIsAdmin }) {
               </div>
               <div className="form-group">
                 <label>Select {deleteCriteria.type} to Delete:</label>
-                <Select
-                  options={dataOptions[deleteCriteria.type] || []}
-                  value={dataOptions[deleteCriteria.type]?.find(
-                    option => option.value === deleteCriteria.id
-                  )}
-
-                  onChange={(selectedOption) =>
-                    setDeleteCriteria(prev => ({
-                      ...prev,
-                      id: selectedOption?.value || '',
-                      name: selectedOption?.label || ''
-                    }))
-                  }
-                  isClearable
-                  placeholder={`Select ${deleteCriteria.type}...`}
-                  isSearchable
+                <PaginatedSearchableDropdown
+                  dataOptions={dataOptions}
+                  deleteCriteria={deleteCriteria}
+                  setDeleteCriteria={setDeleteCriteria}
                 />
               </div>
               <div className="form-group">
