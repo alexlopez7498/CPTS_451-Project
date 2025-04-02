@@ -38,22 +38,33 @@ export default function LandingPage({ isAdmin, setIsAdmin }) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [athleteRes, eventRes, regionRes] = await Promise.all([
+        const [athleteRes, regionRes, eventRes] = await Promise.all([
           fetch('http://localhost:5000/api/getAthletes'),
           fetch('http://localhost:5000/api/getRegions'),
           fetch('http://localhost:5000/api/getEvents')
         ]);
 
-        const [athletes, events, regions] = await Promise.all([
+        const [athletes, regions, events] = await Promise.all([
           athleteRes.json(),
-          eventRes.json(),
-          regionRes.json()
+          regionRes.json(),
+          eventRes.json()
         ]);
+
         setDataOptions({
-          athlete: athletes,
-          event: events,
-          region: regions
+          athlete: athletes.map(a => ({
+            value: a.id || a.athlete_id,
+            label: a.name || a.athlete_name
+          })),
+          event: events.map(e => ({
+            value: e.E_Id,
+            label: `${e.Event} (${e.Year})`
+          })),
+          region: regions.map(r => ({
+            value: r.noc,
+            label: r.region
+          }))
         });
+
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -131,12 +142,37 @@ export default function LandingPage({ isAdmin, setIsAdmin }) {
     setDeleteCriteria(prev => ({
       ...prev,
       [name]: value,
-      ...(name === 'type' && { name: '' })
+      ...(name === 'type' && { name: '', id: '' })
     }));
   };
 
   const handleDeleteSubmit = async (e) => {
     e.preventDefault();
+
+
+    if (deleteCriteria.confirmation !== "DELETE") {
+      alert("Please type 'DELETE' to confirm");
+      return;
+    }
+
+    try {
+      // Prepare delete data based on type
+      let deleteData = {};
+      switch (deleteCriteria.type) {
+        case 'athlete':
+          deleteData = { id: deleteCriteria.id };
+          break;
+        case 'event':
+          deleteData = { E_Id: deleteCriteria.id };
+          break;
+        case 'region':
+          deleteData = { noc: deleteCriteria.id };
+          break;
+        default:
+          throw new Error("Invalid delete type");
+      }
+
+
     const deleteData = {
       type: deleteCriteria.type,
       id: deleteCriteria.id,
@@ -168,7 +204,7 @@ export default function LandingPage({ isAdmin, setIsAdmin }) {
       });
     } catch (error) {
       console.error("Error deleting data:", error);
-      alert("Failed to delete data");
+      alert(`Failed to delete ${deleteCriteria.type}: ${error.message}`);
     }
   };
 
@@ -315,14 +351,11 @@ export default function LandingPage({ isAdmin, setIsAdmin }) {
               <div className="form-group">
                 <label>Select {deleteCriteria.type} to Delete:</label>
                 <Select
-                  options={dataOptions[deleteCriteria.type]?.map(item => ({
-                    value: item.id,
-                    label: item.name
-                  })) || []}
-                  value={dataOptions[deleteCriteria.type]?.map(item => ({
-                    value: item.id,
-                    label: item.name
-                  })).find(option => option.value === deleteCriteria.id)}
+                  options={dataOptions[deleteCriteria.type] || []}
+                  value={dataOptions[deleteCriteria.type]?.find(
+                    option => option.value === deleteCriteria.id
+                  )}
+
                   onChange={(selectedOption) =>
                     setDeleteCriteria(prev => ({
                       ...prev,
@@ -330,8 +363,8 @@ export default function LandingPage({ isAdmin, setIsAdmin }) {
                       name: selectedOption?.label || ''
                     }))
                   }
-                  isDisabled={!deleteCriteria.type}
-                  placeholder={`-- Select ${deleteCriteria.type} --`}
+                  isClearable
+                  placeholder={`Select ${deleteCriteria.type}...`}
                   isSearchable
                 />
               </div>
@@ -353,7 +386,7 @@ export default function LandingPage({ isAdmin, setIsAdmin }) {
                 <button
                   type="submit"
                   className="delete-button"
-                  disabled={!deleteCriteria.name || deleteCriteria.confirmation !== "DELETE"}
+                  disabled={!deleteCriteria.id || deleteCriteria.confirmation !== "DELETE"}
                 >
                   Delete
                 </button>
