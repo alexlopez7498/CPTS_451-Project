@@ -23,7 +23,7 @@ export default function LandingPage({ isAdmin, setIsAdmin }) {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteCriteria, setDeleteCriteria] = useState({
     type: 'athlete',
-    id: '', // Add id field
+    id: '',
     name: '',
     confirmation: ''
   });
@@ -39,28 +39,34 @@ export default function LandingPage({ isAdmin, setIsAdmin }) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [athleteRes, eventRes, regionRes] = await Promise.all([
+        const [athleteRes, regionRes, eventRes] = await Promise.all([
           fetch('http://localhost:5000/api/getAthletes'),
           fetch('http://localhost:5000/api/getRegions'),
           fetch('http://localhost:5000/api/getEvents')
         ]);
 
-        const [athletes, events, regions] = await Promise.all([
+        const [athletes, regions, events] = await Promise.all([
           athleteRes.json(),
-          eventRes.json(),
-          regionRes.json()
+          regionRes.json(),
+          eventRes.json()
         ]);
-        console.log("Fetched athletes:", athletes);
-        console.log("Fetched events:", events);
+
+        // Transform data to consistent format for Select components
         setDataOptions({
-          athlete: athletes,
-          event: events,
-          region: regions
+          athlete: athletes.map(a => ({
+            value: a.id || a.athlete_id,
+            label: a.name || a.athlete_name
+          })),
+          event: events.map(e => ({
+            value: e.E_Id,
+            label: `${e.Event} (${e.Year})`
+          })),
+          region: regions.map(r => ({
+            value: r.noc,
+            label: r.region
+          }))
         });
-        console.log("Data options set:", dataOptions);
-        console.log("Data options athletes:", dataOptions.athlete);
-        console.log("Data options events:", dataOptions.event);
-        console.log("Data options regions:", dataOptions.region);
+
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -146,24 +152,35 @@ export default function LandingPage({ isAdmin, setIsAdmin }) {
     setDeleteCriteria(prev => ({
       ...prev,
       [name]: value,
-      ...(name === 'type' && { name: '' })
+      ...(name === 'type' && { name: '', id: '' })
     }));
   };
 
   const handleDeleteSubmit = async (e) => {
     e.preventDefault();
 
-    console.log("Deleting:", deleteCriteria);
+    if (deleteCriteria.confirmation !== "DELETE") {
+      alert("Please type 'DELETE' to confirm");
+      return;
+    }
 
     try {
-      // Prepare the data to send to the API
-      const deleteData = {
-        type: deleteCriteria.type,
-        id: deleteCriteria.id, // Include id
-        name: deleteCriteria.name
-      };
+      // Prepare delete data based on type
+      let deleteData = {};
+      switch (deleteCriteria.type) {
+        case 'athlete':
+          deleteData = { id: deleteCriteria.id };
+          break;
+        case 'event':
+          deleteData = { E_Id: deleteCriteria.id };
+          break;
+        case 'region':
+          deleteData = { noc: deleteCriteria.id };
+          break;
+        default:
+          throw new Error("Invalid delete type");
+      }
 
-      // Make the API call
       const response = await fetch(`http://localhost:5000/api/delete${deleteCriteria.type}`, {
         method: 'DELETE',
         headers: {
@@ -179,17 +196,16 @@ export default function LandingPage({ isAdmin, setIsAdmin }) {
         throw new Error(errorData.message || 'Delete failed');
       }
 
-      // Reset the delete modal state
       setShowDeleteModal(false);
       setDeleteCriteria({
         type: 'athlete',
-        id: '', 
+        id: '',
         name: '',
         confirmation: ''
       });
     } catch (error) {
       console.error("Error deleting data:", error);
-      alert("Failed to delete data");
+      alert(`Failed to delete ${deleteCriteria.type}: ${error.message}`);
     }
   };
 
@@ -375,23 +391,19 @@ export default function LandingPage({ isAdmin, setIsAdmin }) {
               <div className="form-group">
                 <label>Select {deleteCriteria.type} to Delete:</label>
                 <Select
-                  options={dataOptions[deleteCriteria.type]?.map(item => ({
-                    value: item.id, // Use id as the value
-                    label: item.name // Display name as the label
-                  })) || []}
-                  value={dataOptions[deleteCriteria.type]?.map(item => ({
-                    value: item.id,
-                    label: item.name
-                  })).find(option => option.value === deleteCriteria.id)} // Match by id
+                  options={dataOptions[deleteCriteria.type] || []}
+                  value={dataOptions[deleteCriteria.type]?.find(
+                    option => option.value === deleteCriteria.id
+                  )}
                   onChange={(selectedOption) =>
                     setDeleteCriteria(prev => ({
                       ...prev,
-                      id: selectedOption?.value || '', // Set id
-                      name: selectedOption?.label || '' // Set name
+                      id: selectedOption?.value || '',
+                      name: selectedOption?.label || ''
                     }))
                   }
-                  isDisabled={!deleteCriteria.type}
-                  placeholder={`-- Select ${deleteCriteria.type} --`}
+                  isClearable
+                  placeholder={`Select ${deleteCriteria.type}...`}
                   isSearchable
                 />
               </div>
@@ -415,7 +427,7 @@ export default function LandingPage({ isAdmin, setIsAdmin }) {
                 <button 
                   type="submit" 
                   className="delete-button"
-                  disabled={!deleteCriteria.name || deleteCriteria.confirmation !== "DELETE"}
+                  disabled={!deleteCriteria.id || deleteCriteria.confirmation !== "DELETE"}
                 >
                   Delete
                 </button>
