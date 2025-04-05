@@ -1,5 +1,5 @@
 # Sprint 2 Report 
-Video Link: [Insert Link]
+Video Link: [https://youtu.be/i6Bzj5AJ1Ek]
 ## What's New (User Facing)
  * Landing Page
  * Login as Admin
