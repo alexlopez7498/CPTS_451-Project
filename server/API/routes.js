@@ -11,6 +11,6 @@ router.get('/getAthletes', getData.handleGetAthletes);
 router.get('/getRegions', getData.handleGetRegions);
 router.get('/getEvents', getData.handleGetEvents);
 router.get('/getAthleteInfo/:name', getData.handleGetAthleteInfo);
-router.get('/getEventInfo/:name', getData.handlegetEventInfo);
+router.get('/getEventInfo/:name', getData.handleGetEventInfo);
 router.get('/getYearInfo/:year', getData.handleGetYearInfo);
 module.exports = router;

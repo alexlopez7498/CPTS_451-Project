@@ -47,15 +47,15 @@ INSERT INTO event (Event, Sport, City, Season, Year)
 VALUES (%s, %s, %s, %s, %s, %s, %s);
 """
 insert_athlete_event = """
-INSERT INTO event (ID, E_Id, Medal)
+INSERT INTO athlete_event (ID, E_Id, Medal)
 VALUES (%s, %s, %s);
 """
 insert_team = """
-INSERT INTO event (Team, NOC)
+INSERT INTO team (Team, NOC)
 VALUES (%s, %s);
 """
 insert_athlete_team = """
-INSERT INTO event (ID, T_Id)
+INSERT INTO athlete_team (ID, T_Id)
 VALUES (%s, %s);
 """
 insert_athlete_region = """

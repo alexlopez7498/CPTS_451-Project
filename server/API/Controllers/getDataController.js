@@ -1,4 +1,4 @@
-import sequelize from '../../db_connection';
+const sequelize = require('../../db_connection')
 const Athlete = require("../Models/athlete");
 const Region = require("../Models/region");
 const Event = require("../Models/event");
