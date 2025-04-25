@@ -43,7 +43,7 @@ export default function SearchComponent() {
     setResults([]);
     setChartData([]);
     //else
-    if (searchType === 'athelete') {
+    if (searchType === 'athlete') {
       const res = await fetch(`http://localhost:5000/api/getAthleteInfo/${query.toLowerCase()}`)
       setResults([query])
       setChartData([res]) // input dbQuery data
