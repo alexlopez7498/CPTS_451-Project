@@ -1,13 +1,13 @@
-const AthleteEvent = require('./athleteEvent')
-const athelete = require('./athlete')
-const event = require('./event')
-const region = require('./region')
+const Athlete = require('./athlete');
+const Event = require('./event');
+const AthleteEvent = require('./AthleteEvent');
 
-athelete.belongsToMany(event, {through: AthleteEvent})
-event.belongsToMany(athelete, {through: AthleteEvent})
+// Set up many-to-many relationship
+Athlete.belongsToMany(Event, { through: AthleteEvent, foreignKey: 'id' });
+Event.belongsToMany(Athlete, { through: AthleteEvent, foreignKey: 'E_id' });
 
 module.exports = {
-    athelete,
-    event,
+    Athlete,
+    Event,
     AthleteEvent
-}
+};
