@@ -23,13 +23,16 @@ AthleteEvent.init({
         },
         primaryKey: true
     },
-    medal: {
-        type: DataTypes.STRING(20),
+    Medal: {
+        type: DataTypes.STRING(255),
     }}, {
     sequelize,
     modelName: 'Athlete_Event',
     tableName: 'athlete_event',
     timestamps: false,
+    freezeTableName: true,
+    omitNull: false,
+    syncOnAssociation: false
 })
 
 module.exports = AthleteEvent

@@ -21,12 +21,12 @@ except Exception as e:
 
 # read the CSV files
 region_df = pd.read_csv('C:/Users/epich/Downloads/noc_regions.csv') # replace with the file that has the data on your computer
-athlete_events_df = pd.read_csv('C:/Users/epich/Downloads/vh/athlete_events.csv/athlete_events.csv') # # replace with the file that has the data on your computer
+athlete_events_df = pd.read_csv('C:/Users/epich/Downloads/athlete_events.csv') # # replace with the file that has the data on your computer
 athlete_data = athlete_events_df[['ID', 'Name', 'Sex', 'Age', 'Height', 'Weight', 'NOC']].drop_duplicates('ID')
 event_data = athlete_events_df[['Event', 'Sport', 'City', 'Season', 'Year']].drop_duplicates()
-event_data['E_Id'] = range(1, len(event_data) + 1)
+event_data['e_id'] = range(1, len(event_data) + 1)
 athlete_event_data = athlete_events_df.merge(event_data, on=['Event', 'Sport', 'City', 'Season', 'Year'])
-athlete_event_data = athlete_event_data[['ID', 'E_Id', 'Medal']].drop_duplicates(['ID','E_Id'])
+athlete_event_data = athlete_event_data[['ID', 'e_id', 'Medal']].drop_duplicates(['ID','e_id'])
 team_data = athlete_events_df[['Team', 'NOC']].drop_duplicates()
 team_data['T_Id'] = range(1, len(team_data) + 1)
 athlete_team_data = athlete_events_df.merge(team_data, on=['Team', 'NOC'])
@@ -44,10 +44,11 @@ VALUES (%s, %s, %s, %s, %s, %s, %s);
 """
 insert_event = """
 INSERT INTO event (Event, Sport, City, Season, Year)
-VALUES (%s, %s, %s, %s, %s, %s, %s);
+VALUES (%s, %s, %s, %s, %s)
+RETURNING e_id;
 """
 insert_athlete_event = """
-INSERT INTO athlete_event (ID, E_Id, Medal)
+INSERT INTO athlete_event (id, e_id, Medal)
 VALUES (%s, %s, %s);
 """
 insert_team = """
@@ -77,7 +78,7 @@ event_data_insert = [
     for index, row in event_data.iterrows()
 ]
 athlete_event_data_insert = [
-    (row['ID'], row['E_Id'], row['Medal'])  
+    (row['ID'], row['e_id'], row['Medal'])  
     for index, row in athlete_event_data.iterrows()
 ]
 team_data_insert = [
@@ -92,12 +93,14 @@ athlete_region_data_insert = [
     (int(row['ID']), row['NOC'])  
     for index, row in athlete_region_data.iterrows()
 ]
+
+print(athlete_event_data_insert[:5])  # Check first 5 records
 # below are for inserting each data into their tables
 #############################
 try:
     cursor = conn.cursor()
-    for record in region_df:
-        cursor.execute(region_data_insert, record)
+    for record in region_data_insert:
+        cursor.execute(insert_region, record)
     conn.commit()
     print("Data inserted successfully!")
 except Exception as e:
@@ -108,8 +111,20 @@ finally:
 #############################
 try:
     cursor = conn.cursor()
-    for record in athlete_data:
-        cursor.execute(athlete_data_insert, record)
+    for record in athlete_data_insert:
+        cursor.execute(insert_athlete, record)
+    conn.commit()
+    print("Data inserted successfully!")
+except Exception as e:
+    conn.rollback()
+    print(f"Error: {e}")
+finally:
+    cursor.close()
+############################
+try:
+    cursor = conn.cursor()
+    for record in event_data_insert:
+        cursor.execute(insert_event, record)
     conn.commit()
     print("Data inserted successfully!")
 except Exception as e:
@@ -120,8 +135,8 @@ finally:
 #############################
 try:
     cursor = conn.cursor()
-    for record in event_data:
-        cursor.execute(event_data_insert, record)
+    for record in athlete_event_data_insert:
+        cursor.execute(insert_athlete_event, record)
     conn.commit()
     print("Data inserted successfully!")
 except Exception as e:
@@ -129,11 +144,11 @@ except Exception as e:
     print(f"Error: {e}")
 finally:
     cursor.close()
-#############################
+############################
 try:
     cursor = conn.cursor()
-    for record in athlete_event_data:
-        cursor.execute(athlete_event_data_insert, record)
+    for record in team_data_insert:
+        cursor.execute(insert_team, record)
     conn.commit()
     print("Data inserted successfully!")
 except Exception as e:
@@ -141,11 +156,11 @@ except Exception as e:
     print(f"Error: {e}")
 finally:
     cursor.close()
-#############################
+############################
 try:
     cursor = conn.cursor()
-    for record in team_data:
-        cursor.execute(team_data_insert, record)
+    for record in athlete_team_data_insert:
+        cursor.execute(insert_athlete_team, record)
     conn.commit()
     print("Data inserted successfully!")
 except Exception as e:
@@ -153,22 +168,10 @@ except Exception as e:
     print(f"Error: {e}")
 finally:
     cursor.close()
-#############################
+############################
 try:
     cursor = conn.cursor()
-    for record in athlete_team_data:
-        cursor.execute(athlete_team_data_insert, record)
-    conn.commit()
-    print("Data inserted successfully!")
-except Exception as e:
-    conn.rollback()
-    print(f"Error: {e}")
-finally:
-    cursor.close()
-#############################
-try:
-    cursor = conn.cursor()
-    for record in athlete_region_data:
+    for record in athlete_region_data_insert:
         cursor.execute(insert_athlete_region, record)
     conn.commit()
     print("Data inserted successfully!")

@@ -69,7 +69,7 @@ const handleGetEvents = async (req, res) => {
 const handleGetAthleteInfo = async (req, res) => {
     try {
         const name = req.params['name']
-        const result = await sequelize.query(`SELECT event, COUNT(medal) AS medals FROM athlete, event, athlete_event WHERE athlete.id = athlete_event.id AND event.e_id = athlete_event.e_id AND LOWER(name) = ${name} GROUP BY event`, {
+        const result = await sequelize.query(`SELECT event, COUNT(Medal) AS medals FROM athlete, event, athlete_event WHERE athlete.id = athlete_event.id AND event.e_id = athlete_event.e_id AND LOWER(name) = ${name} GROUP BY event`, {
             type: QueryTypes.SELECT
         })
         res.json(result)
@@ -85,7 +85,7 @@ const handleGetAthleteInfo = async (req, res) => {
 const handleGetEventInfo = async (req, res) => {
     try {
         const event = req.params['name']
-        const result = await sequelize.query(`SELECT team, COUNT(medal) AS golds FROM athlete, event, athlete_event, team, athlete_team WHERE athlete.id = athlete_event.id AND event.e_id = athlete_event.e_id AND athlete.id = athelete_team.id AND athlete_team.t_id = team.t_id AND LOWER(event) = ${event} AND LOWER(medal) = 'gold' GROUP BY team`, {
+        const result = await sequelize.query(`SELECT team, COUNT(Medal) AS golds FROM athlete, event, athlete_event, team, athlete_team WHERE athlete.id = athlete_event.id AND event.e_id = athlete_event.e_id AND athlete.id = athelete_team.id AND athlete_team.t_id = team.t_id AND LOWER(event) = ${event} AND LOWER(medal) = 'gold' GROUP BY team`, {
             type: QueryTypes.SELECT
         })
         res.json(result)
@@ -101,9 +101,10 @@ const handleGetEventInfo = async (req, res) => {
 const handleGetYearInfo = async (req, res) => {
     try {
         const year = req.params['year']
-        const result = await sequelize.query(`SELECT region AS country, COUNT(medal) AS medals FROM athlete, event, athlete_event, region, athlete_region WHERE athlete.id = athlete_event.id AND event.e_id = athlete_event.e_id AND athlete.id = athlete_region.id AND athlete_region.noc = region.noc AND year = ${year} GROUP BY region`, {
+        const result = await sequelize.query(`SELECT region AS country, COUNT(Medal) AS medals FROM athlete, event, athlete_event, region, athlete_region WHERE athlete.id = athlete_event.id AND event.e_id = athlete_event.e_id AND athlete.id = athlete_region.id AND athlete_region.noc = region.noc AND year = ${year} GROUP BY region`, {
             type: QueryTypes.SELECT
         })
+        console.log(result)
         res.json(result)
     } catch (error) {
         console.error(`Error retrieving year info:`, error)

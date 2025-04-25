@@ -24,7 +24,7 @@ const testConnection = async () => {
   }
 }
 
-sequelize.sync({ alter: true }).then(async () => {
+sequelize.sync({ alter: false }).then(async () => {
     console.log('Sequelize sync completed...');
     
     // Fix auto-increment counter
@@ -41,7 +41,6 @@ testConnection();
 
 async function syncDatabase() {
     try {
-        // Sync in correct order
         await Athlete.sync();
         await Event.sync();
         await AthleteEvent.sync();
