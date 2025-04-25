@@ -15,7 +15,7 @@ AthleteEvent.init({
         },
         primaryKey: true
     },
-    E_id: {
+    e_id: {
         type: DataTypes.INTEGER,
         references: {
             model: event,
@@ -23,8 +23,8 @@ AthleteEvent.init({
         },
         primaryKey: true
     },
-    Medal: {
-        type: DataTypes.STRING(255),
+    medal: {
+        type: DataTypes.STRING(20),
     }}, {
     sequelize,
     modelName: 'Athlete_Event',
