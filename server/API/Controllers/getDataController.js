@@ -3,6 +3,7 @@ const Athlete = require("../Models/athlete");
 const Region = require("../Models/region");
 const Event = require("../Models/event");
 const Athlete_Event = require('../Models/AthleteEvent')
+const { QueryTypes } = require('sequelize')
 
 const handleGetAthletes = async (req, res) => {
     try {
@@ -68,7 +69,9 @@ const handleGetEvents = async (req, res) => {
 const handleGetAthleteInfo = async (req, res) => {
     try {
         const name = req.params['name']
-        const result = await sequelize.query(`SELECT event, SUM(medal) FROM athlete, event, athlete_event WHERE athlete.id = athlete_event.id AND event.e_id = athlete_event.e_id AND LOWER(name) = ${name} GROUP BY event`)
+        const result = await sequelize.query(`SELECT event, SUM(medal) FROM athlete, event, athlete_event WHERE athlete.id = athlete_event.id AND event.e_id = athlete_event.e_id AND LOWER(name) = ${name} GROUP BY event`, {
+            type: QueryTypes.SELECT
+        })
         res.json(result)
     } catch (error) {
         console.error(`Error retrieving athelete info:`, error)
@@ -82,7 +85,9 @@ const handleGetAthleteInfo = async (req, res) => {
 const handleGetEventInfo = async (req, res) => {
     try {
         const event = req.params['name']
-        const result = await sequelize.query(`SELECT team, SUM(medal) FROM athlete, event, athlete_event, team, athlete_team WHERE athlete.id = athlete_event.id AND event.e_id = athlete_event.e_id AND athlete.id = athelete_team.id AND athlete_team.t_id = team.t_id AND LOWER(event) = ${event} GROUP BY team`)
+        const result = await sequelize.query(`SELECT team, SUM(medal) FROM athlete, event, athlete_event, team, athlete_team WHERE athlete.id = athlete_event.id AND event.e_id = athlete_event.e_id AND athlete.id = athelete_team.id AND athlete_team.t_id = team.t_id AND LOWER(event) = ${event} GROUP BY team`, {
+            type: QueryTypes.SELECT
+        })
         res.json(result)
     } catch (error) {
         console.error(`Error retrieving event info:`, error)
@@ -96,7 +101,9 @@ const handleGetEventInfo = async (req, res) => {
 const handleGetYearInfo = async (req, res) => {
     try {
         const year = req.params['year']
-        const result = await sequelize.query(`SELECT region, SUM(medal) FROM athlete, event, athlete_event, region, athlete_region WHERE athlete.id = athlete_event.id AND event.e_id = athlete_event.e_id AND athlete.id = athlete_region.id AND athlete_region.noc = region.noc AND year = ${year} GROUP BY region`)
+        const result = await sequelize.query(`SELECT region, SUM(medal) FROM athlete, event, athlete_event, region, athlete_region WHERE athlete.id = athlete_event.id AND event.e_id = athlete_event.e_id AND athlete.id = athlete_region.id AND athlete_region.noc = region.noc AND year = ${year} GROUP BY region`, {
+            type: QueryTypes.SELECT
+        })
         res.json(result)
     } catch (error) {
         console.error(`Error retrieving event info:`, error)
