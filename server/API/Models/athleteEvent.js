@@ -7,26 +7,28 @@ class AthleteEvent extends Model {
 
 }
 AthleteEvent.init({
-    A_id: {
+    id: {
         type: DataTypes.INTEGER,
         references: {
             model: athlete,
             key: 'id'
-        }
+        },
+        primaryKey: true
     },
     E_id: {
         type: DataTypes.INTEGER,
         references: {
             model: event,
-            key: 'E_id'
-        }
+            key: 'e_id'
+        },
+        primaryKey: true
     },
     Medal: {
-        type: DataTypes.STRING
+        type: DataTypes.STRING(255),
     }}, {
     sequelize,
-    modelName: 'Athlete',
-    tableName: 'athlete',
+    modelName: 'Athlete_Event',
+    tableName: 'athlete_event',
     timestamps: false,
 })
 
