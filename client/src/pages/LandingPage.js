@@ -750,6 +750,11 @@ export default function LandingPage({ isAdmin, setIsAdmin }) {
                 setDeleteCriteria={setModifyCriteria}
               />
             </div>
+            <div className="modal-actions">
+                <button type="button" className="cancel-button" onClick={() => setShowModifyModal(false)}>
+                  Cancel
+                </button>
+            </div>
             
             {modifyCriteria.id && (
               <>

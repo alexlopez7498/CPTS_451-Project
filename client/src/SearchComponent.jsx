@@ -64,6 +64,7 @@ export default function SearchComponent() {
     <div>
       <div className="search-container">
         <select
+          className="search-dropdown"
           value={searchType}
           onChange={(e) => setSearchType(e.target.value)}
         >
