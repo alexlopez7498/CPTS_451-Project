@@ -142,7 +142,7 @@ const handleGetAthleteInfo = async (req, res) => {
 const handleGetEventInfo = async (req, res) => {
     try {
         const event = req.params['name']
-        const result = await sequelize.query(`SELECT team, COUNT(Medal) AS golds FROM athlete, event, athlete_event, team, athlete_team WHERE athlete.id = athlete_event.id AND event.e_id = athlete_event.e_id AND athlete.id = athlete_team.id AND athlete_team.t_id = team.t_id AND LOWER(event) = :event AND LOWER(Medal) = 'gold' GROUP BY team`, {
+        const result = await sequelize.query(`SELECT team, COUNT(CASE WHEN LOWER(Medal) = 'gold' THEN 1 ELSE NULL END) AS golds FROM athlete, event, athlete_event, team, athlete_team WHERE athlete.id = athlete_event.id AND event.e_id = athlete_event.e_id AND athlete.id = athlete_team.id AND athlete_team.t_id = team.t_id AND LOWER(event) = :event GROUP BY team`, {
             replacements: { event: event },
             type: QueryTypes.SELECT
             
