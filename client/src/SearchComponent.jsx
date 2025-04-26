@@ -39,24 +39,25 @@ export default function SearchComponent() {
   // };
 
   const handleSearch = async () => {
-    // if no results
     setResults([]);
     setChartData([]);
-    //else
-    if (searchType === 'athelete') {
-      const res = await fetch(`http://localhost:5000/api/getAthleteInfo/${query.toLowerCase()}`)
-      setResults([query])
-      setChartData([res]) // input dbQuery data
+    if (searchType === 'athlete') {
+      const res = await fetch(`http://localhost:5000/api/getAthleteInfo/${query.toLowerCase()}`);
+      const data = await res.json();
+      setResults([query]);
+      setChartData(data);
     } else if (searchType === 'event') {
-      const res = await fetch(`http://localhost:5000/api/getEventInfo/${query.toLowerCase()}`)
-      setResults([query])
-      setChartData([res]) // input dbQuery data
+      const res = await fetch(`http://localhost:5000/api/getEventInfo/${query.toLowerCase()}`);
+      const data = await res.json();
+      setResults([query]);
+      setChartData(data);
     } else if (searchType === 'year') {
-      const res = await fetch(`http://localhost:5000/api/getYearInfo/${query.toLowerCase()}`)
-      setResults([query + ' Olympics'])
-      setChartData([res]) // input dbQuery data
+      const res = await fetch(`http://localhost:5000/api/getYearInfo/${query.toLowerCase()}`);
+      const data = await res.json();
+      setResults([query + ' Olympics']);
+      setChartData(data); // Pass data directly
     }
-  }
+  };
 
   return (
     <div>
