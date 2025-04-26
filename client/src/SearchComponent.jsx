@@ -46,6 +46,7 @@ export default function SearchComponent() {
       const data = await res.json();
       setResults([query]);
       setChartData(data);
+
     } else if (searchType === 'event') {
       const res = await fetch(`http://localhost:5000/api/getEventInfo/${query.toLowerCase()}`);
       const data = await res.json();
