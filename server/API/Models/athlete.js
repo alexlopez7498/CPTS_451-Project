@@ -30,6 +30,19 @@ class Athlete extends Model {
         }
     }
 
+    static async findByIdAndUpdate(id, data) {
+        try {
+            const athlete = await Athlete.findByPk(id);
+            if (!athlete) {
+                return null;
+            }
+            await athlete.update(data);
+            return athlete;
+        } catch (error) {
+            throw error; 
+        }
+    }
+
     static async getAthleteById(id) {
         try {
             const athlete = await Athlete.findByPk(id);

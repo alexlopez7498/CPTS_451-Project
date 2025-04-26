@@ -34,6 +34,19 @@ class Region extends Model {
             return null;
         }
     }
+    
+    static async findByIdAndUpdate(id, data) {
+        try {
+            const region = await Region.findByPk(id);
+            if (!region) {
+                return null;
+            }
+            await region.update(data);
+            return region;
+        } catch (error) {
+            throw error; 
+        }
+    }
 
 }
 

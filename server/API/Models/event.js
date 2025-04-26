@@ -39,6 +39,20 @@ class Event extends Model {
             return null;
         }
     }
+
+    static async findByIdAndUpdate(id, data) {
+        try {
+            const event = await Event.findByPk(id);
+            if (!event) {
+                return null;
+            }
+            await event.update(data);
+            return event;
+        } catch (error) {
+            console.error('Error updating event:', error);
+            return null;
+        }
+    }
 }
 
 Event.init({
