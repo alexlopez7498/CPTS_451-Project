@@ -119,6 +119,8 @@ const handleGetRegion = async (req, res) => {
             error: "Internal Server Error",
             details: error.message,
         });
+    }
+}
 const handleGetAthleteInfo = async (req, res) => {
     try {
         const name = req.params['name']
@@ -179,8 +181,8 @@ module.exports = {
     handleGetEvents,
     handleGetAthlete,
     handleGetEvent,
-    handleGetRegion
+    handleGetRegion,
     handleGetAthleteInfo,
     handleGetEventInfo,
-    handleGetYearInfo
+    handleGetYearInfo,
 };

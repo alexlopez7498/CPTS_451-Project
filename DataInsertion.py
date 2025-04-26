@@ -12,7 +12,7 @@ def to_float(val):
 conn_params = {
     'dbname': 'database451',
     'user': 'postgres',
-    'password': 'Superjq1!',
+    'password': '',
     'host': 'localhost',
     'port': '5432'
 }
