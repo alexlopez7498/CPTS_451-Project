@@ -4,6 +4,9 @@ const cors = require("cors");
 const sequelize = require("./db_connection")
 const port = 5000;
 const routes = require('./API/routes');
+const Athlete = require("./API/Models/athlete");
+const Event = require("./API/Models/event");
+const AthleteEvent = require('./API/Models/AthleteEvent')
 require("dotenv").config();
 
 
@@ -21,7 +24,7 @@ const testConnection = async () => {
   }
 }
 
-sequelize.sync({ alter: true }).then(async () => {
+sequelize.sync({ alter: false }).then(async () => {
     console.log('Sequelize sync completed...');
     
     // Fix auto-increment counter
@@ -35,6 +38,20 @@ sequelize.sync({ alter: true }).then(async () => {
 });
 
 testConnection();
+
+async function syncDatabase() {
+    try {
+        await Athlete.sync();
+        await Event.sync();
+        await AthleteEvent.sync();
+        
+        console.log('Database synchronized successfully');
+    } catch (error) {
+        console.error('Error syncing database:', error);
+    }
+}
+
+syncDatabase();
 
 app.listen(port, () =>{
     console.log(`server has started on port ${port}`);

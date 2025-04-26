@@ -1,6 +1,9 @@
+const sequelize = require('../../db_connection')
 const Athlete = require("../Models/athlete");
 const Region = require("../Models/region");
 const Event = require("../Models/event");
+const Athlete_Event = require('../Models/AthleteEvent')
+const { QueryTypes } = require('sequelize')
 
 const handleGetAthletes = async (req, res) => {
     try {
@@ -57,6 +60,7 @@ const handleGetEvents = async (req, res) => {
         });
     }
 }
+
 
 const handleGetAthlete = async (req, res) => {
     const { id } = req.params;
@@ -115,6 +119,57 @@ const handleGetRegion = async (req, res) => {
             error: "Internal Server Error",
             details: error.message,
         });
+const handleGetAthleteInfo = async (req, res) => {
+    try {
+        const name = req.params['name']
+        const result = await sequelize.query(`SELECT event, COUNT(Medal) AS medals FROM athlete, event, athlete_event WHERE athlete.id = athlete_event.id AND event.e_id = athlete_event.e_id AND LOWER(name) = :name GROUP BY event`, {
+            replacements: { name: name },
+            type: QueryTypes.SELECT
+        })
+        console.log(result)
+        res.json(result)
+    } catch (error) {
+        console.error(`Error retrieving athelete info:`, error)
+        res.status(500).json({
+            error: 'Internal Server Error',
+            details: error.messsage
+        })
+    }
+}
+
+const handleGetEventInfo = async (req, res) => {
+    try {
+        const event = req.params['name']
+        const result = await sequelize.query(`SELECT team, COUNT(Medal) AS golds FROM athlete, event, athlete_event, team, athlete_team WHERE athlete.id = athlete_event.id AND event.e_id = athlete_event.e_id AND athlete.id = athlete_team.id AND athlete_team.t_id = team.t_id AND LOWER(event) = :event AND LOWER(Medal) = 'gold' GROUP BY team`, {
+            replacements: { event: event },
+            type: QueryTypes.SELECT
+            
+        })
+        console.log(result)
+        res.json(result)
+    } catch (error) {
+        console.error(`Error retrieving event info:`, error)
+        res.status(500).json({
+            error: 'Internal Server Error',
+            details: error.messsage
+        })
+    }
+}
+
+const handleGetYearInfo = async (req, res) => {
+    try {
+        const year = req.params['year']
+        const result = await sequelize.query(`SELECT region AS country, COUNT(Medal) AS medals FROM athlete, event, athlete_event, region, athlete_region WHERE athlete.id = athlete_event.id AND event.e_id = athlete_event.e_id AND athlete.id = athlete_region.id AND athlete_region.noc = region.noc AND year = ${year} GROUP BY region`, {
+            type: QueryTypes.SELECT
+        })
+        console.log(result)
+        res.json(result)
+    } catch (error) {
+        console.error(`Error retrieving year info:`, error)
+        res.status(500).json({
+            error: 'Internal Server Error',
+            details: error.messsage
+        })
     }
 }
 
@@ -125,4 +180,7 @@ module.exports = {
     handleGetAthlete,
     handleGetEvent,
     handleGetRegion
+    handleGetAthleteInfo,
+    handleGetEventInfo,
+    handleGetYearInfo
 };

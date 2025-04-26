@@ -17,7 +17,6 @@ router.delete('/deleteAthlete', deleteAthlete.handleDeleteAthlete);
 router.get('/getAthletes', getData.handleGetAthletes);
 router.get('/getRegions', getData.handleGetRegions);
 router.get('/getEvents', getData.handleGetEvents);
-
 router.put('/modifyathlete', modifyAthlete.handleModifyAthlete);
 router.put('/modifyevent', modifyEvent.handleModifyEvent);
 router.put('/modifyregion', modifyRegion.handleModifyRegion);
@@ -26,4 +25,7 @@ router.get('/getathlete/:id', getSingleAthlete.handleGetAthlete);
 router.get('/getevent/:id', getSingleEvent.handleGetEvent);
 router.get('/getregion/:id', getSingleRegion.handleGetRegion);
 
+router.get('/getAthleteInfo/:name', getData.handleGetAthleteInfo);
+router.get('/getEventInfo/:name', getData.handleGetEventInfo);
+router.get('/getYearInfo/:year', getData.handleGetYearInfo);
 module.exports = router;

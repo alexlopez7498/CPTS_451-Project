@@ -22,8 +22,8 @@
   text-align: center;
   color: white;
   padding: 20px;
-  width: 80%;
-  max-width: 600px;
+  width: 100%;
+  max-width: 1200px; /* Increased to allow graph space */
   background: rgba(0, 0, 0, 0.6);
   border-radius: 12px;
   box-shadow: 0 4px 10px rgba(255, 255, 255, 0.2);
@@ -72,14 +72,10 @@
 
 /* Results */
 .results-container {
-  background: white;
-  color: black;
-  padding: 15px;
-  border-radius: 8px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
   width: 100%;
-  max-width: 400px;
+  max-width: 1100px;
   margin: 20px auto;
+  overflow: visible; /* Ensure chart isn’t clipped */
 }
 
 .results-container ul {
@@ -140,6 +136,7 @@
   border-radius: 5px;
   cursor: pointer;
 }
+
 .admin-button:hover {
   background: #000000;
 }

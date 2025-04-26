@@ -7,34 +7,56 @@ export default function SearchComponent() {
   const [results, setResults] = useState([]);
   const [chartData, setChartData] = useState([]);
 
-  const handleSearch = () => {
-    if (searchType === "athlete" && query.toLowerCase() === "usain bolt") {
-      setResults(["Usain Bolt"]);
-      setChartData([
-        { event: "100m", medals: 3 },
-        { event: "200m", medals: 3 },
-        { event: "4x100m Relay", medals: 2 },
-      ]);
-    } else if (searchType === "event" && query.toLowerCase() === "men's basketball") {
-      setResults(["Men's Basketball"]);
-      setChartData([
-        { team: "USA", golds: 15 },
-        { team: "Soviet Union", golds: 2 },
-        { team: "Yugoslavia", golds: 1 },
-        { team: "Argentina", golds: 1 },
-      ]);
-    } else if (searchType === "year" && query === "2004") {
-      setResults(["2004 Olympics"]);
-      setChartData([
-        { country: "USA", medals: 101 },
-        { country: "China", medals: 63 },
-        { country: "Russia", medals: 90 },
-        { country: "Australia", medals: 49 },
-        { country: "Germany", medals: 41 },
-      ]);
-    } else {
-      setResults([]);
-      setChartData([]);
+  // const handleSearch = () => {
+  //   if (searchType === "athlete" && query.toLowerCase() === "usain bolt") {
+  //     setResults(["Usain Bolt"]);
+  //     setChartData([
+  //       { event: "100m", medals: 3 },
+  //       { event: "200m", medals: 3 },
+  //       { event: "4x100m Relay", medals: 2 },
+  //     ]);
+  //   } else if (searchType === "event" && query.toLowerCase() === "men's basketball") {
+  //     setResults(["Men's Basketball"]);
+  //     setChartData([
+  //       { team: "USA", golds: 15 },
+  //       { team: "Soviet Union", golds: 2 },
+  //       { team: "Yugoslavia", golds: 1 },
+  //       { team: "Argentina", golds: 1 },
+  //     ]);
+  //   } else if (searchType === "year" && query === "2004") {
+  //     setResults(["2004 Olympics"]);
+  //     setChartData([
+  //       { country: "USA", medals: 101 },
+  //       { country: "China", medals: 63 },
+  //       { country: "Russia", medals: 90 },
+  //       { country: "Australia", medals: 49 },
+  //       { country: "Germany", medals: 41 },
+  //     ]);
+  //   } else {
+  //     setResults([]);
+  //     setChartData([]);
+  //   }
+  // };
+
+  const handleSearch = async () => {
+    setResults([]);
+    setChartData([]);
+    if (searchType === 'athlete') {
+      const res = await fetch(`http://localhost:5000/api/getAthleteInfo/${query.toLowerCase()}`);
+      const data = await res.json();
+      setResults([query]);
+      setChartData(data);
+
+    } else if (searchType === 'event') {
+      const res = await fetch(`http://localhost:5000/api/getEventInfo/${query.toLowerCase()}`);
+      const data = await res.json();
+      setResults([query]);
+      setChartData(data);
+    } else if (searchType === 'year') {
+      const res = await fetch(`http://localhost:5000/api/getYearInfo/${query.toLowerCase()}`);
+      const data = await res.json();
+      setResults([query + ' Olympics']);
+      setChartData(data); // Pass data directly
     }
   };
 

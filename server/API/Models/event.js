@@ -56,35 +56,35 @@ class Event extends Model {
 }
 
 Event.init({
-    E_Id: {
+    e_id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,
     },
-    Event: {
+    event: {
         type: DataTypes.STRING(200),
         allowNull: false,
     },
-    Sport: {
+    sport: {
         type: DataTypes.STRING(100),
         allowNull: false,
     },
-    City: {
+    city: {
         type: DataTypes.STRING(100),
         allowNull: false,
     },
-    Season: {
+    season: {
         type: DataTypes.STRING(10),
         allowNull: false,
     },
-    Year: {
+    year: {
         type: DataTypes.INTEGER,
         allowNull: false,
     },
 }, {
     sequelize,
     modelName: 'Event',
-    tableName: 'Event',
+    tableName: 'event',
     timestamps: false,
 });
 
