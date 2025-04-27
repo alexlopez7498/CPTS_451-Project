@@ -1,8 +1,8 @@
 const { Router } = require('express');
 const router = Router();
-const insertAthlete = require('./Controllers/insertAthlete');
+const insertController = require('./Controllers/insertController');
 const getData = require('./Controllers/getDataController');
-const deleteAthlete = require('./Controllers/deleteAthlete');
+const deleteController = require('./Controllers/deleteController');
 const modifyAthlete = require('./Controllers/modifyDataController');
 const modifyEvent = require('./Controllers/modifyDataController');
 const modifyRegion = require('./Controllers/modifyDataController');
@@ -10,10 +10,12 @@ const getSingleAthlete = require('./Controllers/getDataController');
 const getSingleEvent = require('./Controllers/getDataController');
 const getSingleRegion = require('./Controllers/getDataController');
 
-router.post('/insertAthlete', insertAthlete.handleAthlete);
-router.delete('/deleteAthlete', deleteAthlete.handleDeleteAthlete);
-// router.delete('/deleteevent', deleteEvent.handleDeleteEvent);
-// router.delete('/deleteregion', deleteRegion.handleDeleteRegion);
+router.post('/insertAthlete', insertController.handleAthlete);
+router.post('/insertEvent', insertController.handleEvent);
+router.post('/insertRegion', insertController.handleRegion);
+router.delete('/deleteAthlete', deleteController.handleDeleteAthlete);
+router.delete('/deleteevent', deleteController.handleDeleteEvent);
+router.delete('/deleteregion', deleteController.handleDeleteRegion);
 router.get('/getAthletes', getData.handleGetAthletes);
 router.get('/getRegions', getData.handleGetRegions);
 router.get('/getEvents', getData.handleGetEvents);

@@ -48,20 +48,17 @@ const PaginatedSearchableDropdown = ({ dataOptions, deleteCriteria, setDeleteCri
 
 const ModifyForm = ({ type, id, onInputChange, onSubmit, onCancel }) => {
   const [formData, setFormData] = useState({
-    // Athlete 
     name: '',
     sex: '',
     age: '',
     height: '',
     weight: '',
     noc: '',
-    // Event 
     Event: '',
     Sport: '',
     City: '',
     Season: '',
     Year: '',
-    // Region
     region: '',
     notes: ''
   });
@@ -315,14 +312,22 @@ export default function LandingPage({ isAdmin, setIsAdmin }) {
     name: '',
     confirmation: ''
   });
-  const [showAddAthleteModal, setShowAddAthleteModal] = useState(false);
-  const [newAthlete, setNewAthlete] = useState({
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [addType, setAddType] = useState('athlete');
+  const [newData, setNewData] = useState({
     name: '',
     sex: '',
     age: '',
     height: '',
     weight: '',
-    noc: ''
+    noc: '',
+    Event: '',
+    Sport: '',
+    City: '',
+    Season: '',
+    Year: '',
+    region: '',
+    notes: ''
   });
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteCriteria, setDeleteCriteria] = useState({
@@ -375,58 +380,92 @@ export default function LandingPage({ isAdmin, setIsAdmin }) {
     navigate("/");
   };
 
-  const handleAddAthleteClick = () => {
-    fetchData();
-    setShowAddAthleteModal(true);
+  const handleAddClick = (type) => {
+    setAddType(type);
+    setShowAddModal(true);
+    setNewData({
+      name: '',
+      sex: '',
+      age: '',
+      height: '',
+      weight: '',
+      noc: '',
+      Event: '',
+      Sport: '',
+      City: '',
+      Season: '',
+      Year: '',
+      region: '',
+      notes: ''
+    });
   };
 
-  const handleAthleteInputChange = (e) => {
+  const handleNewDataChange = (e) => {
     const { name, value } = e.target;
-    setNewAthlete(prev => ({
+    setNewData(prev => ({
       ...prev,
       [name]: value
     }));
   };
 
-  const handleSubmitAthlete = async (e) => {
+  const handleSubmitNewData = async (e) => {
     e.preventDefault();
-    const athleteData = {
-      name: newAthlete.name,
-      sex: newAthlete.sex,
-      age: newAthlete.age,
-      height: newAthlete.height,
-      weight: newAthlete.weight,
-      noc: newAthlete.noc
-    };
+    let apiEndpoint = '';
+    let requestData = {};
+
+    switch (addType) {
+      case 'athlete':
+        apiEndpoint = 'insertAthlete';
+        requestData = {
+          name: newData.name,
+          sex: newData.sex,
+          age: newData.age,
+          height: newData.height,
+          weight: newData.weight,
+          noc: newData.noc
+        };
+        break;
+      case 'event':
+        apiEndpoint = 'insertEvent';
+        requestData = {
+          eventName: newData.Event,
+          sport: newData.Sport,
+          city: newData.City,
+          season: newData.Season,
+          year: newData.Year
+        };
+        break;
+      case 'region':
+        apiEndpoint = 'insertRegion';
+        requestData = {
+          noc: newData.noc,
+          region: newData.region,
+          notes: newData.notes
+        };
+        break;
+      default:
+        break;
+    }
 
     try {
-      const response = await fetch('http://localhost:5000/api/insertAthlete', {
+      const response = await fetch(`http://localhost:5000/api/${apiEndpoint}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(athleteData),
+        body: JSON.stringify(requestData),
       });
 
       if (response.ok) {
-        alert('New Athlete inserted!');
+        alert(`New ${addType} inserted successfully!`);
+        setShowAddModal(false);
       } else {
         const errorData = await response.json();
         throw new Error(errorData.message || 'Insert failed');
       }
-
-      setShowAddAthleteModal(false);
-      setNewAthlete({
-        name: '',
-        sex: '',
-        age: '',
-        height: '',
-        weight: '',
-        noc: ''
-      });
     } catch (error) {
-      console.error("Error adding athlete:", error);
-      alert("Failed to add athlete");
+      console.error(`Error adding ${addType}:`, error);
+      alert(`Failed to add ${addType}: ${error.message}`);
     }
   };
 
@@ -460,7 +499,6 @@ export default function LandingPage({ isAdmin, setIsAdmin }) {
 
   const handleModifySubmit = async (formData) => {
     try {
-      console.log(formData);
       const response = await fetch(`http://localhost:5000/api/modify${modifyCriteria.type}`, {
         method: 'PUT',
         headers: {
@@ -566,8 +604,14 @@ export default function LandingPage({ isAdmin, setIsAdmin }) {
           <div className="admin-controls">
             <h2>Admin Controls</h2>
             <div className="admin-buttons-container">
-              <button className="admin-button" onClick={handleAddAthleteClick}>
+              <button className="admin-button" onClick={() => handleAddClick('athlete')}>
                 Add Athlete
+              </button>
+              <button className="admin-button" onClick={() => handleAddClick('event')}>
+                Add Event
+              </button>
+              <button className="admin-button" onClick={() => handleAddClick('region')}>
+                Add Region
               </button>
               <button className="admin-button" onClick={handleModifyRecordsClick}>
                 Modify Records
@@ -580,83 +624,185 @@ export default function LandingPage({ isAdmin, setIsAdmin }) {
         )}
       </div>
 
-      {showAddAthleteModal && (
+      {showAddModal && (
         <div className="modal-overlay">
           <div className="modal-content">
-            <h3>Add New Athlete</h3>
-            <form onSubmit={handleSubmitAthlete}>
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Name:</label>
-                  <input
-                    type="text"
-                    name="name"
-                    value={newAthlete.name}
-                    onChange={handleAthleteInputChange}
-                    maxLength="255"
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Sex (M/F):</label>
-                  <input
-                    type="text"
-                    name="sex"
-                    value={newAthlete.sex}
-                    onChange={handleAthleteInputChange}
-                    maxLength="1"
-                    required
-                  />
-                </div>
-              </div>
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Age:</label>
-                  <input
-                    type="number"
-                    name="age"
-                    value={newAthlete.age}
-                    onChange={handleAthleteInputChange}
-                    step="0.1"
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Height (cm):</label>
-                  <input
-                    type="number"
-                    name="height"
-                    value={newAthlete.height}
-                    onChange={handleAthleteInputChange}
-                    step="0.1"
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Weight (kg):</label>
-                  <input
-                    type="number"
-                    name="weight"
-                    value={newAthlete.weight}
-                    onChange={handleAthleteInputChange}
-                    step="0.1"
-                    required
-                  />
-                </div>
-              </div>
-              <div className="form-group">
-                <label>NOC (3-letter code):</label>
-                <input
-                  type="text"
-                  name="noc"
-                  value={newAthlete.noc}
-                  onChange={handleAthleteInputChange}
-                  maxLength="3"
-                  required
-                />
-              </div>
+            <h3>Add New {addType.charAt(0).toUpperCase() + addType.slice(1)}</h3>
+            <form onSubmit={handleSubmitNewData}>
+              {addType === 'athlete' && (
+                <>
+                  <div className="form-row">
+                    <div className="form-group">
+                      <label>Name:</label>
+                      <input
+                        type="text"
+                        name="name"
+                        value={newData.name}
+                        onChange={handleNewDataChange}
+                        maxLength="255"
+                        required
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Sex (M/F):</label>
+                      <input
+                        type="text"
+                        name="sex"
+                        value={newData.sex}
+                        onChange={handleNewDataChange}
+                        maxLength="1"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div className="form-row">
+                    <div className="form-group">
+                      <label>Age:</label>
+                      <input
+                        type="number"
+                        name="age"
+                        value={newData.age}
+                        onChange={handleNewDataChange}
+                        step="0.1"
+                        required
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Height (cm):</label>
+                      <input
+                        type="number"
+                        name="height"
+                        value={newData.height}
+                        onChange={handleNewDataChange}
+                        step="0.1"
+                        required
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Weight (kg):</label>
+                      <input
+                        type="number"
+                        name="weight"
+                        value={newData.weight}
+                        onChange={handleNewDataChange}
+                        step="0.1"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div className="form-group">
+                    <label>NOC (3-letter code):</label>
+                    <input
+                      type="text"
+                      name="noc"
+                      value={newData.noc}
+                      onChange={handleNewDataChange}
+                      maxLength="3"
+                      required
+                    />
+                  </div>
+                </>
+              )}
+
+              {addType === 'event' && (
+                <>
+                  <div className="form-group">
+                    <label>Event Name:</label>
+                    <input
+                      type="text"
+                      name="Event"
+                      value={newData.Event}
+                      onChange={handleNewDataChange}
+                      required
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Sport:</label>
+                    <input
+                      type="text"
+                      name="Sport"
+                      value={newData.Sport}
+                      onChange={handleNewDataChange}
+                      required
+                    />
+                  </div>
+                  <div className="form-row">
+                    <div className="form-group">
+                      <label>City:</label>
+                      <input
+                        type="text"
+                        name="City"
+                        value={newData.City}
+                        onChange={handleNewDataChange}
+                        required
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Season:</label>
+                      <select
+                        name="Season"
+                        value={newData.Season}
+                        onChange={handleNewDataChange}
+                        required
+                      >
+                        <option value="">Select Season</option>
+                        <option value="Summer">Summer</option>
+                        <option value="Winter">Winter</option>
+                      </select>
+                    </div>
+                    <div className="form-group">
+                      <label>Year:</label>
+                      <input
+                        type="number"
+                        name="Year"
+                        value={newData.Year}
+                        onChange={handleNewDataChange}
+                        min="1896"
+                        max="2024"
+                        required
+                      />
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {addType === 'region' && (
+                <>
+                  <div className="form-group">
+                    <label>NOC Code (3 letters):</label>
+                    <input
+                      type="text"
+                      name="noc"
+                      value={newData.noc}
+                      onChange={handleNewDataChange}
+                      maxLength="3"
+                      required
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Region Name:</label>
+                    <input
+                      type="text"
+                      name="region"
+                      value={newData.region}
+                      onChange={handleNewDataChange}
+                      required
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Notes:</label>
+                    <textarea
+                      name="notes"
+                      value={newData.notes}
+                      onChange={handleNewDataChange}
+                      className="notes-textarea"
+                    />
+                  </div>
+                </>
+              )}
+
               <div className="modal-actions">
-                <button type="button" className="cancel-button" onClick={() => setShowAddAthleteModal(false)}>
+                <button type="button" className="cancel-button" onClick={() => setShowAddModal(false)}>
                   Cancel
                 </button>
                 <button type="submit" className="submit-button">
