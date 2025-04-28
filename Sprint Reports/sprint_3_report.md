@@ -1,5 +1,5 @@
 # Sprint 2 Report 
-Video Link: []
+Video Link: [https://youtu.be/_z64mEP9iwE]
 ## What's New (User Facing)
  * Full Admin Controls
  * Data Visualization
